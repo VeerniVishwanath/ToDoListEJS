@@ -3,12 +3,17 @@
   <h1><%= titleName %></h1>
 </div>
 <div class="box">
+  <!-- Render Each List Item -->
   <% items.forEach((value)=>{ %>
-  <div class="item">
-    <input type="checkbox" />
-    <p class="item"><%= value.name%></p>
-  </div>
+  <form action="/delete" method="post">
+    <div class="item">
+      <input type="checkbox" name="checkbox" value="<%= value._id%>" onchange="this.form.submit()" />
+      <p class="item"><%= value.name%></p>
+    </div>
+  </form>
+
   <%})%>
+  <!-- Textarea to create new List Item -->
   <form class="item" action="/" method="post">
     <input type="text" name="newItem" placeholder="New item" />
     <button type="submit" name="button" value="<%= titleName %>">+</button>

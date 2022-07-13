@@ -77,13 +77,13 @@ async function main() {
 
   // Home Post Method
   app.post("/", (req, res) => {
-    var itemName = req.body.newItem;
-    var button = req.body.button;
+    const itemName = req.body.newItem;
+    const button = req.body.button;
 
     // Create new Item Document
     const item = new Item({
-      name:itemName,
-    })
+      name: itemName,
+    });
     item.save();
     res.redirect("/");
 
@@ -94,6 +94,19 @@ async function main() {
     //   items.push(item);
     //   res.redirect("/");
     // }
+  });
+
+  // Delete Post Method
+  app.post("/delete", (req, res) => {
+    const itemId = req.body.checkbox;
+    Item.deleteOne({ _id: itemId })
+      .then(() => {
+        console.log("Successfully Deleted");
+      })
+      .catch((err) => {
+        console.log("Error is" + err);
+      });
+    res.redirect("/");
   });
 }
 app.listen(3000, () => {
