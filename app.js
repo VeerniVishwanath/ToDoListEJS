@@ -3,6 +3,12 @@ const app = express();
 const date = require(__dirname + "/date.js");
 const mongoose = require("mongoose");
 
+app.use(express.urlencoded({ extended: true })); //BodyParser
+
+app.set("view engine", "ejs");
+
+app.use(express.static("public"));
+
 // Mongoose DataBase Connnection
 
 main().catch((err) => console.log(err));
@@ -39,45 +45,57 @@ async function main() {
 
   const defaultItems = [item1, item2, item3];
 
-  Item.insertMany(defaultItems)
-    .then(() => {
-      console.log("Successfully Inserted data");
-    })
-    .catch((err) => {
-      console.log(err);
+  // Item.find((err,results)=>{
+  //   console.log(results);
+  // })
+
+  // Home Get Method
+  app.get("/", (req, res) => {
+    const day = date.getDate();
+
+    Item.find({}, (err, foundItems) => {
+      if (foundItems.length === 0) {
+        // Saving to DB
+        Item.insertMany(defaultItems)
+          .then(() => {
+            console.log("Successfully Inserted data");
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+        res.redirect("/");
+      } else {
+        res.render("list", { titleName: day, items: foundItems });
+      }
     });
-}
+  });
 
-app.use(express.urlencoded({ extended: true })); //BodyParser
+  // Work Get Method
+  app.get("/work", (req, res) => {
+    res.render("list", { titleName: "Work", items: workItems });
+  });
 
-app.set("view engine", "ejs");
+  // Home Post Method
+  app.post("/", (req, res) => {
+    var itemName = req.body.newItem;
+    var button = req.body.button;
 
-app.use(express.static("public"));
-
-// Home Get Method
-app.get("/", (req, res) => {
-  const day = date.getDate();
-  res.render("list", { titleName: day, items: items });
-});
-
-// Work Get Method
-app.get("/work", (req, res) => {
-  res.render("list", { titleName: "Work", items: workItems });
-});
-
-// Home Post Method
-app.post("/", (req, res) => {
-  var item = req.body.newItem;
-  var button = req.body.button;
-  if (button == "Work") {
-    workItems.push(item);
-    res.redirect("/work");
-  } else {
-    items.push(item);
+    // Create new Item Document
+    const item = new Item({
+      name:itemName,
+    })
+    item.save();
     res.redirect("/");
-  }
-});
 
+    // if (button == "Work") {
+    //   workItems.push(item);
+    //   res.redirect("/work");
+    // } else {
+    //   items.push(item);
+    //   res.redirect("/");
+    // }
+  });
+}
 app.listen(3000, () => {
   console.log("server running on port 3000");
 });
