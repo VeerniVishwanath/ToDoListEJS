@@ -53,13 +53,12 @@ async function main() {
   });
 
   // Model for ListSchema
-  const customList = new mongoose.model("customList", customListSchema);
+  const CustomList = new mongoose.model("CustomList", customListSchema);
 
   const defaultItems = [item1, item2, item3];
 
   // Home Get Method
   app.get("/", (req, res) => {
-
     Item.find({}, (err, foundItems) => {
       if (foundItems.length === 0) {
         // Saving to DB
@@ -79,15 +78,16 @@ async function main() {
 
   //  Dynamic Paths
   app.get("/:customPath", (req, res) => {
-    const customPath = _.lowerCase(req.params.customPath);
+    const customPath = _.capitalize(req.params.customPath);
 
-    customList.findOne({ name: customPath }, (err, result) => {
+    CustomList.findOne({ name: customPath }, (err, result) => {
+      console.log(result);
       if (err) {
         console.log(err);
       } else {
         if (!result) {
           // Creating Documents
-          const list = new customList({
+          const list = new CustomList({
             name: customPath,
             customItems: defaultItems,
           }).save();
@@ -114,34 +114,51 @@ async function main() {
     const item = new Item({
       name: itemName,
     });
-    
-    if( button == day){
+
+    if (button == day) {
       item.save();
       res.redirect("/");
-    }else{
-      customList.findOne({name:button},(err,result)=>{
-        if(!err){
+    } else {
+      CustomList.findOne({ name: button }, (err, result) => {
+        if (!err) {
           result.customItems.push(item);
           result.save();
-          res.redirect("/"+button);
+          res.redirect("/" + button);
         }
-      })
+      });
     }
   });
 
   // Delete Post Method
   app.post("/delete", (req, res) => {
     const itemId = req.body.checkbox;
-    Item.deleteOne({ _id: itemId })
-      .then(() => {
-        console.log("Successfully Deleted");
-      })
-      .catch((err) => {
-        console.log("Error is" + err);
+    const titleName = req.body.titleName;
+
+    if (titleName == day) {
+      Item.findByIdAndDelete(itemId, (err, docs) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("Deleted :" + docs);
+        }
       });
-    res.redirect("/");
+      res.redirect("/");
+    } else {
+      CustomList.findOneAndUpdate(
+        { name: titleName },
+        { $pull: { customItems: { _id: itemId } } },
+        (err, result) => {
+          if (!err) {
+            console.log("Deleted");
+          } else {
+            console.log(err);
+          }
+        }
+      );
+      res.redirect("/" + titleName);
+    }
   });
 }
-app.listen(3000, () => {
+app.listen(process.env.PORT || 3000, () => {
   console.log("server running on port 3000");
 });

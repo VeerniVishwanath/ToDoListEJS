@@ -7,9 +7,15 @@
   <% items.forEach((value)=>{ %>
   <form action="/delete" method="post">
     <div class="item">
-      <input type="checkbox" name="checkbox" value="<%= value._id%>" onchange="this.form.submit()" />
+      <input
+        type="checkbox"
+        name="checkbox"
+        value="<%= value._id%>"
+        onchange="this.form.submit()"
+      />
       <p class="item"><%= value.name%></p>
     </div>
+    <input type="hidden" name="titleName" value="<%=titleName%>" />
   </form>
 
   <%})%>
