@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const date = require(__dirname + "/date.js");
 const mongoose = require("mongoose");
+const _ = require("lodash");
 
 app.use(express.urlencoded({ extended: true })); //BodyParser
 
@@ -43,11 +44,16 @@ async function main() {
     name: "<-- Hit this button to delete an item.",
   });
 
-  const defaultItems = [item1, item2, item3];
+  // Schema for customList
+  const customListSchema = new mongoose.Schema({
+    name: String,
+    customItems: [itemSchema],
+  });
 
-  // Item.find((err,results)=>{
-  //   console.log(results);
-  // })
+  // Model for ListSchema
+  const customList = new mongoose.model("customList", customListSchema);
+
+  const defaultItems = [item1, item2, item3];
 
   // Home Get Method
   app.get("/", (req, res) => {
@@ -70,9 +76,32 @@ async function main() {
     });
   });
 
-  // Work Get Method
-  app.get("/work", (req, res) => {
-    res.render("list", { titleName: "Work", items: workItems });
+  //  Dynamic Paths
+  app.get("/:customPath", (req, res) => {
+    const customPath = _.lowerCase(req.params.customPath);
+
+    customList.findOne({ name: customPath }, (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        if (!result) {
+          // Creating Documents
+          const list = new customList({
+            name: customPath,
+            customItems: defaultItems,
+          }).save();
+
+          setTimeout(() => {
+            res.redirect("/" + customPath);
+          }, 200);
+        } else {
+          res.render("list", {
+            titleName: customPath,
+            items: result.customItems,
+          });
+        }
+      }
+    });
   });
 
   // Home Post Method
