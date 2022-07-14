@@ -4,6 +4,8 @@ const date = require(__dirname + "/date.js");
 const mongoose = require("mongoose");
 const _ = require("lodash");
 
+const day = date.getDate();
+
 app.use(express.urlencoded({ extended: true })); //BodyParser
 
 app.set("view engine", "ejs");
@@ -57,7 +59,6 @@ async function main() {
 
   // Home Get Method
   app.get("/", (req, res) => {
-    const day = date.getDate();
 
     Item.find({}, (err, foundItems) => {
       if (foundItems.length === 0) {
@@ -113,16 +114,19 @@ async function main() {
     const item = new Item({
       name: itemName,
     });
-    item.save();
-    res.redirect("/");
-
-    // if (button == "Work") {
-    //   workItems.push(item);
-    //   res.redirect("/work");
-    // } else {
-    //   items.push(item);
-    //   res.redirect("/");
-    // }
+    
+    if( button == day){
+      item.save();
+      res.redirect("/");
+    }else{
+      customList.findOne({name:button},(err,result)=>{
+        if(!err){
+          result.customItems.push(item);
+          result.save();
+          res.redirect("/"+button);
+        }
+      })
+    }
   });
 
   // Delete Post Method
