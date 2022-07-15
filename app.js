@@ -17,7 +17,8 @@ app.use(express.static("public"));
 main().catch((err) => console.log(err));
 
 async function main() {
-  const url = "mongodb://127.0.0.1:27017";
+  const url =
+    "mongodb+srv://admin-vishwanath:hpK23yqf2ro0SpI2@cluster0.olpmf.mongodb.net";
   const Path = "/todolistDB";
   await mongoose.connect(url + Path);
 
@@ -81,7 +82,6 @@ async function main() {
     const customPath = _.capitalize(req.params.customPath);
 
     CustomList.findOne({ name: customPath }, (err, result) => {
-      console.log(result);
       if (err) {
         console.log(err);
       } else {
@@ -117,7 +117,9 @@ async function main() {
 
     if (button == day) {
       item.save();
-      res.redirect("/");
+      setTimeout(() => {
+        res.redirect("/");
+      }, 200);
     } else {
       CustomList.findOne({ name: button }, (err, result) => {
         if (!err) {
@@ -142,7 +144,9 @@ async function main() {
           console.log("Deleted :" + docs);
         }
       });
-      res.redirect("/");
+      setTimeout(() => {
+        res.redirect("/");
+      }, 200);
     } else {
       CustomList.findOneAndUpdate(
         { name: titleName },
