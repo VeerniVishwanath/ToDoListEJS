@@ -1,7 +1,7 @@
 # ToDOListEJS
 
 A ToDo-List App made using Express & EJS with MongoDB -
-[Link](https://quiet-garden-42591.herokuapp.com/).
+[Link](https://todo-list-42591.herokuapp.com/).
 
 ## Available Scripts
 
