@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const date = require(__dirname + "/date.js");
@@ -18,7 +19,7 @@ main().catch((err) => console.log(err));
 
 async function main() {
   const url =
-    "mongodb+srv://admin-vishwanath:hpK23yqf2ro0SpI2@cluster0.olpmf.mongodb.net";
+    "mongodb+srv://admin-vishwanath:"+process.env.PASSWORD+"@cluster0.olpmf.mongodb.net";
   const Path = "/todolistDB";
   await mongoose.connect(url + Path);
 
